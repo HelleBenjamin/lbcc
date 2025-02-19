@@ -9,6 +9,9 @@
 #include <stdnoreturn.h>
 #include <string.h>
 
+// Output file that has the compiled code.
+extern FILE *output;
+
 /// util.c
 
 noreturn void error(char *fmt, ...) __attribute__((format(printf, 1, 2)));

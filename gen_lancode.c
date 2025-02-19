@@ -14,16 +14,22 @@ __attribute__((format(printf, 1, 2))) static void emit(char *fmt, ...);
 static void p(char *fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
-  vprintf(fmt, ap);
-  printf("\n");
+  if (output) { // Check if output is not null
+    vfprintf(output, fmt, ap);
+    fprintf(output, "\n");
+  }
+  va_end(ap);
 }
 
 static void emit(char *fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
-  printf("\t");
-  vprintf(fmt, ap);
-  printf("\n");
+  if (output) {
+    fprintf(output, "\t");
+    vfprintf(output, fmt, ap);
+    fprintf(output, "\n");
+  }
+  va_end(ap);
 }
 
 static void emit_cmp(char *insn, IR *ir) {

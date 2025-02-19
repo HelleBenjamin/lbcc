@@ -1,7 +1,9 @@
 #include "lbcc.h"
 
+FILE *output;
+
 void usage() {
-  error("Usage: lbcc [-test] [-dump-ir1] [-dump-ir2] <file>");
+  error("Usage: lbcc <input file> <output file>\n");
 }
 
 int main(int argc, char **argv) {
@@ -13,21 +15,12 @@ int main(int argc, char **argv) {
     return 0;
   }
 
-  char *path;
+  char *path = argv[1];
+  if (argc == 3) output = fopen(argv[2], "w");
+
+  // TODO: Implement IR dumps
   bool dump_ir1 = false;
   bool dump_ir2 = false;
-
-  if (argc == 3 && !strcmp(argv[1], "-dump-ir1")) {
-    dump_ir1 = true;
-    path = argv[2];
-  } else if (argc == 3 && !strcmp(argv[1], "-dump-ir2")) {
-    dump_ir2 = true;
-    path = argv[2];
-  } else {
-    if (argc != 2)
-      usage();
-    path = argv[1];
-  }
 
   // Tokenize and parse.
   Vector *tokens = tokenize(path, true);
@@ -46,5 +39,8 @@ int main(int argc, char **argv) {
     dump_ir(prog->funcs);
 
   gen_lancode(prog);
+
+  if(output) fclose(output);
+
   return 0;
 }
