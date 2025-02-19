@@ -1,4 +1,4 @@
-#include "9cc.h"
+#include "lbcc.h"
 
 static int regno(Reg *r) {
   if (!r)

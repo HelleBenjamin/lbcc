@@ -1,4 +1,4 @@
-#include "9cc.h"
+#include "lbcc.h"
 
 noreturn void error(char *fmt, ...) {
   va_list ap;
@@ -26,6 +26,10 @@ Vector *new_vec() {
 }
 
 void vec_push(Vector *v, void *elem) {
+  if (!v) {
+    printf("NULL Vector!\n");
+    return;
+  }
   if (v->len == v->capacity) {
     v->capacity *= 2;
     v->data = realloc(v->data, sizeof(void *) * v->capacity);
@@ -171,8 +175,8 @@ Type *char_ty() {
   return new_ty(CHAR, 1);
 }
 
-Type *int_ty() {
-  return new_ty(INT, 4);
+Type *short_ty() {
+  return new_ty(SHORT, 2);
 }
 
 Type *func_ty(Type *returning) {

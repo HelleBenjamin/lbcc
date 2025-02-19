@@ -1,6 +1,6 @@
 // Liveness analysis.
 
-#include "9cc.h"
+#include "lbcc.h"
 
 // Fill bb->succ and bb->pred.
 static void add_edges(BB *bb) {

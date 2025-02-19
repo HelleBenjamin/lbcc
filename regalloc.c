@@ -16,7 +16,7 @@
 // The last register (num_regs-1'th register) is reserved for that
 // purpose.
 
-#include "9cc.h"
+#include "lbcc.h"
 
 // Rewrite `A = B op C` to `A = B; A = A op C`.
 static void three_to_two(BB *bb) {
@@ -186,7 +186,7 @@ void alloc_regs(Program *prog) {
         continue;
 
       Var *var = calloc(1, sizeof(Var));
-      var->ty = ptr_to(int_ty());
+      var->ty = ptr_to(short_ty());
       var->is_local = true;
       var->name = "spill";
 

@@ -79,7 +79,7 @@ Type *ary_of(Type *base, int len);
 Type *void_ty();
 Type *bool_ty();
 Type *char_ty();
-Type *int_ty();
+Type *short_ty();
 Type *func_ty(Type *returning);
 bool same_type(Type *x, Type *y);
 int roundup(int x, int align);
@@ -97,7 +97,7 @@ enum {
   TK_ARROW,     // ->
   TK_EXTERN,    // "extern"
   TK_TYPEDEF,   // "typedef"
-  TK_INT,       // "int"
+  TK_SHORT,       // "int"
   TK_CHAR,      // "char"
   TK_VOID,      // "void"
   TK_STRUCT,    // "struct"
@@ -211,7 +211,7 @@ enum {
   VOID = 1,
   BOOL,
   CHAR,
-  INT,
+  SHORT,
   PTR,
   ARY,
   STRUCT,
@@ -303,7 +303,7 @@ typedef struct {
 
 Program *parse(Vector *tokens);
 
-Node *new_int_node(int val, Token *t);
+Node *new_short_node(short val, Token *t);
 
 /// sema.c
 
@@ -345,6 +345,7 @@ enum {
   IR_STORE_ARG,
   IR_STORE_SPILL,
   IR_NOP,
+  IR_VMEXIT
 };
 
 typedef struct Reg {
@@ -422,11 +423,9 @@ void liveness(Program *prog);
 
 void alloc_regs(Program *prog);
 
-/// gen_x86.c
+/// gen_lancode.c
 
 extern char *regs[];
-extern char *regs8[];
-extern char *regs32[];
 extern int num_regs;
 
-void gen_x86(Program *prog);
+void gen_lancode(Program *prog);

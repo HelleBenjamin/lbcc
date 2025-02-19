@@ -1,4 +1,4 @@
-#include "9cc.h"
+#include "lbcc.h"
 
 // 9cc's code generation is two-pass. In the first pass, abstract
 // syntax trees are compiled to IR (intermediate representation).

@@ -1,6 +1,6 @@
 // C preprocessor
 
-#include "9cc.h"
+#include "lbcc.h"
 
 static Map *macros;
 

@@ -3,7 +3,7 @@
 // register values than the number of the physical registers, but
 // that's fine. Regalloc will spill them out to memory.
 
-#include "9cc.h"
+#include "lbcc.h"
 
 // Rewrite
 //
@@ -19,7 +19,7 @@
 static void opt(IR *ir) {
   if (ir->op == IR_BPREL) {
     Var *var = ir->var;
-    if (var->address_taken || var->ty->ty != INT)
+    if (var->address_taken || var->ty->ty != SHORT)
       return;
 
     if (!var->promoted)

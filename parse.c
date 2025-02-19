@@ -1,4 +1,4 @@
-#include "9cc.h"
+#include "lbcc.h"
 
 // This is a recursive-descendent parser which constructs abstract
 // syntax tree from input tokens.
@@ -78,6 +78,7 @@ static Var *add_lvar(Type *ty, char *name) {
   var->is_local = true;
   var->name = name;
   map_put(env->vars, name, var);
+  if (!lvars) lvars = new_vec();
   vec_push(lvars, var);
   return var;
 }
@@ -123,7 +124,7 @@ static bool is_typename() {
   Token *t = tokens->data[pos];
   if (t->ty == TK_IDENT)
     return find_typedef(t->name);
-  return t->ty == TK_INT || t->ty == TK_CHAR || t->ty == TK_VOID ||
+  return t->ty == TK_SHORT || t->ty == TK_CHAR || t->ty == TK_VOID ||
          t->ty == TK_STRUCT || t->ty == TK_TYPEOF || t->ty == TK_BOOL;
 }
 
@@ -161,8 +162,8 @@ static Type *decl_specifiers() {
     return bool_ty();
   if (t->ty == TK_CHAR)
     return char_ty();
-  if (t->ty == TK_INT)
-    return int_ty();
+  if (t->ty == TK_SHORT)
+    return short_ty();
 
   if (t->ty == TK_TYPEOF) {
     expect('(');
@@ -237,9 +238,9 @@ static Node *new_deref(Token *t, Var *var) {
   return new_expr(ND_DEREF, t, new_varref(t, var));
 }
 
-Node *new_int_node(int val, Token *t) {
+Node *new_short_node(short val, Token *t) {
   Node *node = new_node(ND_NUM, t);
-  node->ty = int_ty();
+  node->ty = short_ty();
   node->val = val;
   return node;
 }
@@ -285,7 +286,7 @@ static Node *function_call(Token *t) {
     node->ty = var->ty;
   } else {
     warn_token(t, "undefined function");
-    node->ty = func_ty(int_ty());
+    node->ty = func_ty(short_ty());
   }
 
   while (!consume(')')) {
@@ -329,7 +330,7 @@ static Node *primary() {
   }
 
   if (t->ty == TK_NUM)
-    return new_int_node(t->val, t);
+    return new_short_node(t->val, t);
 
   if (t->ty == TK_STR)
     return string_literal(t);
@@ -370,7 +371,7 @@ static Node *new_post_inc(Token *t, Node *e, int imm) {
   vec_push(v, new_binop('=', t, new_varref(t, var2), new_deref(t, var1)));
   vec_push(v, new_binop(
                   '=', t, new_deref(t, var1),
-                  new_binop('+', t, new_deref(t, var1), new_int_node(imm, t))));
+                  new_binop('+', t, new_deref(t, var1), new_short_node(imm, t))));
   vec_push(v, new_varref(t, var2));
   return new_stmt_expr(t, v);
 }
@@ -419,7 +420,7 @@ static Node *unary() {
   Token *t = tokens->data[pos];
 
   if (consume('-'))
-    return new_binop('-', t, new_int_node(0, t), unary());
+    return new_binop('-', t, new_short_node(0, t), unary());
   if (consume('*'))
     return new_expr(ND_DEREF, t, unary());
   if (consume('&'))
@@ -429,13 +430,13 @@ static Node *unary() {
   if (consume('~'))
     return new_expr('~', t, unary());
   if (consume(TK_SIZEOF))
-    return new_int_node(get_type(unary())->size, t);
+    return new_short_node(get_type(unary())->size, t);
   if (consume(TK_ALIGNOF))
-    return new_int_node(get_type(unary())->align, t);
+    return new_short_node(get_type(unary())->align, t);
   if (consume(TK_INC))
-    return new_assign_eq('+', unary(), new_int_node(1, t));
+    return new_assign_eq('+', unary(), new_short_node(1, t));
   if (consume(TK_DEC))
-    return new_assign_eq('-', unary(), new_int_node(1, t));
+    return new_assign_eq('-', unary(), new_short_node(1, t));
   return postfix();
 }
 
@@ -886,6 +887,11 @@ static void toplevel() {
 
   char *name = ident();
 
+  lvars = new_vec();
+  breaks = new_vec();
+  continues = new_vec();
+  switches = new_vec();
+
   // Function
   if (consume('(')) {
     Vector *params = new_vec();
@@ -897,11 +903,6 @@ static void toplevel() {
 
     Token *t = tokens->data[pos];
     Node *node = new_node(ND_DECL, t);
-
-    lvars = new_vec();
-    breaks = new_vec();
-    continues = new_vec();
-    switches = new_vec();
 
     node->name = name;
     node->params = params;

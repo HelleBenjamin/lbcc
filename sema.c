@@ -1,4 +1,4 @@
-#include "9cc.h"
+#include "lbcc.h"
 
 // Semantics analyzer. This pass plays a few important roles as shown
 // below:
@@ -45,7 +45,7 @@ static Node *scale_ptr(int op, Node *base, Type *ty) {
   Node *node = calloc(1, sizeof(Node));
   node->op = op;
   node->lhs = base;
-  node->rhs = new_int_node(ty->ptr_to->size, base->token);
+  node->rhs = new_short_node(ty->ptr_to->size, base->token);
   node->token = base->token;
   return node;
 }
@@ -59,9 +59,9 @@ static Node *cast(Node *base, Type *ty) {
   return node;
 }
 
-static void check_int(Node *node) {
-  int t = node->ty->ty;
-  if (t != INT && t != CHAR && t != BOOL)
+static void check_short(Node *node) {
+  short t = node->ty->ty;
+  if (t != SHORT && t != CHAR && t != BOOL)
     bad_node(node, "not an integer");
 }
 
@@ -116,13 +116,13 @@ static Node *do_walk(Node *node, bool decay) {
       node->lhs = node->rhs;
       node->rhs = n;
     }
-    check_int(node->rhs);
+    check_short(node->rhs);
 
     if (node->lhs->ty->ty == PTR) {
       node->rhs = scale_ptr('*', node->rhs, node->lhs->ty);
       node->ty = node->lhs->ty;
     } else {
-      node->ty = int_ty();
+      node->ty = short_ty();
     }
     return node;
   case '-': {
@@ -138,7 +138,7 @@ static Node *do_walk(Node *node, bool decay) {
       node = scale_ptr('/', node, lty);
       node->ty = lty;
     } else {
-      node->ty = int_ty();
+      node->ty = short_ty();
     }
     return node;
   }
@@ -186,9 +186,9 @@ static Node *do_walk(Node *node, bool decay) {
   case ND_LOGOR:
     node->lhs = walk(node->lhs);
     node->rhs = walk(node->rhs);
-    check_int(node->lhs);
-    check_int(node->rhs);
-    node->ty = int_ty();
+    check_short(node->lhs);
+    check_short(node->rhs);
+    node->ty = short_ty();
     return node;
   case ',':
     node->lhs = walk(node->lhs);
@@ -198,8 +198,8 @@ static Node *do_walk(Node *node, bool decay) {
   case '!':
   case '~':
     node->expr = walk(node->expr);
-    check_int(node->expr);
-    node->ty = int_ty();
+    check_short(node->expr);
+    node->ty = short_ty();
     return node;
   case ND_ADDR:
     node->expr = walk(node->expr);

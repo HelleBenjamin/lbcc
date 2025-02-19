@@ -1,7 +1,7 @@
-#include "9cc.h"
+#include "lbcc.h"
 
 void usage() {
-  error("Usage: 9cc [-test] [-dump-ir1] [-dump-ir2] <file>");
+  error("Usage: lbcc [-test] [-dump-ir1] [-dump-ir2] <file>");
 }
 
 int main(int argc, char **argv) {
@@ -45,6 +45,6 @@ int main(int argc, char **argv) {
   if (dump_ir2)
     dump_ir(prog->funcs);
 
-  gen_x86(prog);
+  gen_lancode(prog);
   return 0;
 }

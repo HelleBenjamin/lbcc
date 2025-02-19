@@ -1,4 +1,4 @@
-#include "9cc.h"
+#include "lbcc.h"
 
 // Unit tests for our data structures.
 //
