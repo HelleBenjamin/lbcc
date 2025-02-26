@@ -1,5 +1,11 @@
+
+void printc(char c);
+
 short main() {
-    char *vmp = 0x01;
-    *vmp = '0';
-    return 0;
+    printc('a');
+    __vmexit 100;
+}
+
+void printc(char c) {
+    asm("out r3");
 }

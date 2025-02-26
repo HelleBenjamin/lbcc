@@ -406,10 +406,22 @@ static void gen_stmt(Node *node) {
     jmp(node->target->continue_);
     out = new_bb();
     break;
+  case ND_ASM: {
+    IR *ir = new_ir(IR_ASM);
+    ir->name = node->name;
+    out = new_bb();
+    return;
+  }
   case ND_RETURN: {
     Reg *r = gen_expr(node->expr);
     IR *ir = new_ir(IR_RETURN);
     ir->r2 = r;
+    out = new_bb();
+    return;
+  }
+  case ND_VMEXIT: {
+    IR *ir = new_ir(IR_VMEXIT);
+    ir->imm = node->expr->val;
     out = new_bb();
     return;
   }

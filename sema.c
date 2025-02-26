@@ -219,6 +219,7 @@ static Node *do_walk(Node *node, bool decay) {
 
     node->ty = node->expr->ty->ptr_to;
     return maybe_decay(node, decay);
+  case ND_VMEXIT:
   case ND_RETURN:
   case ND_EXPR_STMT:
     node->expr = walk(node->expr);
@@ -240,6 +241,8 @@ static Node *do_walk(Node *node, bool decay) {
     node->ty = node->expr->ty;
     return node;
   }
+  case ND_ASM:
+    return node;
   default:
     assert(0 && "unknown node type");
   }

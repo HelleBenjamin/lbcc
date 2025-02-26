@@ -140,6 +140,8 @@ enum {
   TK_TYPEOF,    // "typeof"
   TK_PARAM,     // Function-like macro parameter
   TK_EOF,       // End marker
+  TK_ASM,       // "asm"
+  TK_VMEXIT,    // "__vmexit"
 };
 
 // Token type
@@ -208,6 +210,8 @@ enum {
   ND_EXPR_STMT, // Expression statement
   ND_STMT_EXPR, // Statement expression (GNU extn.)
   ND_NULL,      // Null statement
+  ND_ASM,       // Inline assembly, asm("...")
+  ND_VMEXIT,    // "__vmexit"
 };
 
 enum {
@@ -348,6 +352,7 @@ enum {
   IR_STORE_ARG,
   IR_STORE_SPILL,
   IR_NOP,
+  IR_ASM,
   IR_VMEXIT
 };
 

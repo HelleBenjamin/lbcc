@@ -254,6 +254,11 @@ static char *ident() {
   return t->name;
 }
 
+static char *inlineAssembly(Token *t) {
+  Token *t2 = tokens->data[pos++];
+  return t2->str;
+}
+
 static Node *string_literal(Token *t) {
   Type *ty = ary_of(char_ty(), t->len);
   char *name = format(".L.str%d", nlabel++);
@@ -849,6 +854,20 @@ static Node *stmt() {
   }
   case TK_RETURN: {
     Node *node = new_node(ND_RETURN, t);
+    node->expr = expr();
+    expect(';');
+    return node;
+  }
+  case TK_ASM: {
+    Node *node = new_node(ND_ASM, t);
+    expect('(');
+    node->name = inlineAssembly(t);
+    expect(')');
+    expect(';');
+    return node;
+  }
+  case TK_VMEXIT: {
+    Node *node = new_node(ND_VMEXIT, t);
     node->expr = expr();
     expect(';');
     return node;

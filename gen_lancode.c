@@ -79,10 +79,10 @@ static void emit_ir(IR *ir, char *ret) {
     emit("ld %s, %s", regs[r0], ir->name);
     break;
   case IR_EQ: // TODO: re-implement IR_EQ-IR_LE
-    emit_cmp("sete", ir);
+    emit_cmp("setz", ir);
     break;
   case IR_NE:
-    emit_cmp("setne", ir);
+    emit_cmp("setnz", ir);
     break;
   case IR_LT:
     emit_cmp("setl", ir);
@@ -124,7 +124,7 @@ static void emit_ir(IR *ir, char *ret) {
     emit("pop r4");
     break;
   case IR_LOAD_SPILL:
-    emit("ld %s, [bp%s%d]", regs[r0], ir->var->offset == 0 ? "" : "+", ir->var->offset);
+    emit("ld %s, [bp%s%d]", regs[r0], ir->var->offset == 0 ? "+" : "", ir->var->offset);
     break;
   case IR_STORE:
     emit("push r3");
@@ -133,10 +133,10 @@ static void emit_ir(IR *ir, char *ret) {
     emit("pop r3");
     break;
   case IR_STORE_ARG:
-    emit("ld [bp%s%d], %s", ir->var->offset == 0 ? "" : "+", ir->var->offset, argreg(ir->imm, ir->size));
+    emit("ld [bp%s%d], %s", ir->var->offset == 0 ? "+" : "", ir->var->offset, argreg(ir->imm, ir->size));
     break;
   case IR_STORE_SPILL:
-    emit("ld [bp%s%d], %s", ir->var->offset == 0 ? "" : "+", ir->var->offset, regs[r1]);
+    emit("ld [bp%s%d], %s", ir->var->offset == 0 ? "+" : "", ir->var->offset, regs[r1]);
     break;
   case IR_ADD:
     emit("add %s, %s", regs[r0], regs[r2]);
@@ -159,6 +159,12 @@ static void emit_ir(IR *ir, char *ret) {
     emit("mov %s, rdx", regs[r0]);
     break;
   case IR_NOP:
+    break;
+  case IR_ASM:
+    emit("%s", ir->name);
+    break;
+  case IR_VMEXIT:
+    emit("vmexit %d", ir->imm);
     break;
   default:
     assert(0 && "unknown operator");
@@ -237,9 +243,9 @@ static void emit_data(Var *var) {
 
 void gen_lancode(Program *prog) {
 
+  for (int i = 0; i < prog->funcs->len; i++)
+    emit_code(prog->funcs->data[i]);
   //for (int i = 0; i < prog->gvars->len; i++)
   //  emit_data(prog->gvars->data[i]);
 
-  for (int i = 0; i < prog->funcs->len; i++)
-    emit_code(prog->funcs->data[i]);
 }

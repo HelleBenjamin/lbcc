@@ -192,6 +192,8 @@ static Map *keyword_map() {
   map_puti(map, "typeof", TK_TYPEOF);
   map_puti(map, "void", TK_VOID);
   map_puti(map, "while", TK_WHILE);
+  map_puti(map, "asm", TK_ASM);
+  map_puti(map, "__vmexit", TK_VMEXIT);
   return map;
 }
 
